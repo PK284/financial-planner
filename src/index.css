@@ -22,6 +22,8 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --transition-fast: 0.2s ease-in-out;
+  --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --header-height: 60px;
 }
 
 * {
@@ -98,4 +100,112 @@ input:focus, select:focus, button:focus {
 }
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Layout Classes */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .main-container {
+    flex-direction: row;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+  }
+}
+
+.sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  transform: translateX(-101%);
+  transition: transform var(--transition-slow);
+  background: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-wrapper.open {
+  transform: translateX(0);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-wrapper {
+    position: sticky;
+    transform: none;
+    height: 100vh;
+    width: auto;
+    z-index: 1;
+    background: var(--bg-sidebar);
+  }
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    padding: 24px;
+  }
+}
+
+/* Tab Scrolling for Mobile */
+.tabs-scrollable {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs-scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+/* Grid Adjustments */
+.grid-cols-mobile {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .grid-cols-mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  .grid-cols-mobile {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Mobile Header */
+.mobile-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+@media (min-width: 1024px) {
+  .mobile-header {
+    display: none;
+  }
 }

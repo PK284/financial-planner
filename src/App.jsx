@@ -137,6 +137,8 @@ export default function FinancialPlanner() {
     const [moCustom, setMoCustom] = useLocalStorage("fp_moCustom", {});
     const [showAdd, setShowAdd] = useState(false);
     const [newField, setNewField] = useState({ label: "", amount: 0 });
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
 
     const isDefault = selMonth === "__default";
     const curCustom = isDefault ? defCustom : (moCustom[selMonth] || defCustom);
@@ -274,19 +276,43 @@ export default function FinancialPlanner() {
     };
 
     return (
-        <div style={{ fontFamily: "'DM Sans','Segoe UI',sans-serif", background: BG, color: TEXT, minHeight: "100vh", display: "grid", gridTemplateColumns: "300px 1fr", fontSize: 13 }}>
-
-            {/* LEFT */}
-            <div className="glass-card" style={{ background: "var(--bg-sidebar)", borderRight: `1px solid ${BORDER}`, padding: "12px", overflowY: "auto", maxHeight: "100vh", borderRadius: 0, borderTop: 0, borderBottom: 0, borderLeft: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                    <div>
-                        <div style={{ fontSize: 16, fontWeight: 800, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Financial Planner</div>
-                        <div style={{ fontSize: 9, color: DIM }}>Apr 2026 → Mar 2027</div>
-                    </div>
-                    <button onClick={() => setHide(h => !h)} style={{ padding: "3px 8px", borderRadius: 5, fontSize: 9, fontWeight: 700, cursor: "pointer", border: `1px solid ${hide ? "#f59e0b" : BORDER}`, background: "#0f2035", color: hide ? "#f59e0b" : MUTED }}>
-                        {hide ? "👁 Show ₹" : "🙈 Hide ₹"}
-                    </button>
+        <div className="main-container" style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: BG, color: TEXT }}>
+            
+            {/* MOBILE HEADER */}
+            <header className="mobile-header">
+                <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Financial Planner</div>
+                    <div style={{ fontSize: 8, color: DIM }}>Apr '26 → Mar '27</div>
                 </div>
+                <button 
+                    onClick={() => setSidebarOpen(true)}
+                    style={{ background: "#1d3a6b", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+                >
+                    ⚙️ Settings
+                </button>
+            </header>
+
+            {/* LEFT / SIDEBAR */}
+            <div className={`sidebar-wrapper ${sidebarOpen ? 'open' : ''}`}>
+                <div style={{ padding: "12px", flex: 1, overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                        <div>
+                            <div style={{ fontSize: 16, fontWeight: 800, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Settings</div>
+                            <div style={{ fontSize: 9, color: DIM }}>Configure your plan</div>
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                            <button onClick={() => setHide(h => !h)} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, cursor: "pointer", border: `1px solid ${hide ? "#f59e0b" : BORDER}`, background: "transparent", color: hide ? "#f59e0b" : MUTED }}>
+                                {hide ? "👁 Show" : "🙈 Hide"}
+                            </button>
+                            <button 
+                                className="mobile-only"
+                                onClick={() => setSidebarOpen(false)}
+                                style={{ background: "none", border: "none", color: "#ef4444", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center" }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                    </div>
 
                 {/* Salary */}
                 <div style={{ ...cs, background: "linear-gradient(135deg,#0f2a4a,#1a1040)", textAlign: "center", padding: "10px 14px" }}>
@@ -460,43 +486,52 @@ export default function FinancialPlanner() {
                         <Slider label="CAGR" value={cagr} onChange={setCagr} min={6} max={20} step={1} color="#3b82f6" suffix="%" hideNums={false} />
                     </div>
                 )}
-            </div>
 
-            {/* RIGHT */}
-            <div style={{ overflowY: "auto", maxHeight: "100vh", padding: 16, background: BG }}>
-                <div style={{ display: "flex", gap: 4, marginBottom: 16, flexWrap: "wrap" }}>
+                {/* Mobile Close Indicator */}
+                <button 
+                    onClick={() => setSidebarOpen(false)}
+                    style={{ width: "100%", padding: "12px", marginTop: "20px", borderRadius: 12, background: "linear-gradient(135deg,#1d4ed8,#1e3a8a)", color: "#fff", border: "none", fontWeight: 700, cursor: "pointer" }}
+                    className="mobile-only"
+                >
+                    Apply & Close
+                </button>
+            </div>
+            
+            {/* RIGHT - MAIN CONTENT */}
+            <div className="content-wrapper">
+                <div className="tabs-scrollable" style={{ marginBottom: 16 }}>
                     {[["overview", "🗺 Overview"], ["allocation", "🥧 Allocation"], ["timeline", "📋 Timeline"], ["funds", "📊 Funds"], ["projection", "🚀 Projection"]].map(([k, l]) => (
-                        <button key={k} onClick={() => setMainTab(k)} style={{ ...tabS(mainTab === k), padding: "8px 16px", fontSize: 12, borderRadius: 9 }}>{l}</button>
+                        <button key={k} onClick={() => setMainTab(k)} style={{ ...tabS(mainTab === k), padding: "10px 18px", fontSize: 13, borderRadius: 12, whiteSpace: "nowrap" }}>{l}</button>
                     ))}
                 </div>
 
                 {/* OVERVIEW */}
                 {mainTab === "overview" && (
                     <div>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 14 }}>
+                        <div className="grid-cols-mobile" style={{ marginBottom: 16 }}>
                             {[
                                 { t: "Avg SIP/mo", v: hide ? "---" : fmt(p2AvgSIP), c: "#60a5fa", sub: "Base" },
                                 { t: "Phase 2 SIP", v: hide ? "---" : fmt(p2AvgSIP), c: "#a78bfa", sub: `From ${p2StartLabel}` },
                                 { t: "Extra/mo", v: hide ? "---" : fmt(avgExtra), c: "#60a5fa", sub: "→ EF + SIP" },
                                 { t: "RD Maturity", v: hide ? "---" : fmtK(rdMaturity), c: "#22c55e", sub: "Mar '27" },
                             ].map(({ t, v, c, sub }) => (
-                                <div key={t} style={{ ...cs, textAlign: "center", padding: "10px 8px" }}>
-                                    <div style={{ fontSize: 8, color: MUTED, fontWeight: 700, letterSpacing: 0.5 }}>{t}</div>
-                                    <div style={{ fontSize: 20, fontWeight: 900, color: c, margin: "4px 0 2px" }}>{v}</div>
-                                    <div style={{ fontSize: 8, color: DIM }}>{sub}</div>
+                                <div key={t} style={{ ...cs, textAlign: "center", padding: "16px 12px" }}>
+                                    <div style={{ fontSize: 9, color: MUTED, fontWeight: 700, letterSpacing: 0.5 }}>{t}</div>
+                                    <div style={{ fontSize: 24, fontWeight: 900, color: c, margin: "6px 0 4px" }}>{v}</div>
+                                    <div style={{ fontSize: 9, color: DIM }}>{sub}</div>
                                 </div>
                             ))}
                         </div>
 
                         {/* Monthly budget map */}
                         <div style={{ ...cs, marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Monthly Budget Map <span style={{ fontSize: 9, color: DIM, fontWeight: 400 }}>— click to edit</span></div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 6 }}>
+                            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Monthly Budget Map <span style={{ fontSize: 9, color: DIM, fontWeight: 400 }}>— scroll to see all</span></div>
+                            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8, WebkitOverflowScrolling: "touch" }}>
                                 {timeline.map(r => (
-                                    <div key={r.key} onClick={() => { setSelMonth(r.key); setLeftTab("budget"); }} style={{ background: r.overridden ? CARD2 : CARD, borderRadius: 8, padding: "7px 4px", textAlign: "center", cursor: "pointer", border: `1px solid ${r.overridden ? "#3b82f6" : BORDER}` }}>
-                                        <div style={{ fontSize: 9, fontWeight: 700, color: r.overridden ? "#60a5fa" : MUTED }}>{r.label}</div>
-                                        <div style={{ fontSize: 8, color: DIM, marginTop: 1 }}>SIP {fmtK(r.sip)}</div>
-                                        <div style={{ fontSize: 8, fontWeight: 700, color: r.phase === 2 ? "#3b82f6" : "#22c55e", marginTop: 1 }}>{r.phase === 1 ? "P1" : "P2"}</div>
+                                    <div key={r.key} onClick={() => { setSelMonth(r.key); setLeftTab("budget"); setSidebarOpen(true); }} style={{ minWidth: 100, background: r.overridden ? CARD2 : CARD, borderRadius: 10, padding: "12px 8px", textAlign: "center", cursor: "pointer", border: `1px solid ${r.overridden ? "#3b82f6" : BORDER}`, flexShrink: 0 }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: r.overridden ? "#60a5fa" : MUTED }}>{r.label}</div>
+                                        <div style={{ fontSize: 9, color: DIM, marginTop: 4 }}>SIP {fmtK(r.sip)}</div>
+                                        <div style={{ fontSize: 9, fontWeight: 700, color: r.phase === 2 ? "#3b82f6" : "#22c55e", marginTop: 4 }}>{r.phase === 1 ? "Phase 1" : "Phase 2"}</div>
                                     </div>
                                 ))}
                             </div>
@@ -526,25 +561,25 @@ export default function FinancialPlanner() {
 
                         {/* Emergency Fund */}
                         <div style={{ ...cs, marginBottom: 12 }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                                <div style={{ fontSize: 12, fontWeight: 700 }}>🏦 Emergency Fund</div>
-                                <div style={{ fontSize: 11, fontWeight: 700, color: "#8b5cf6" }}>{hide ? "---" : fmtK(efTarget)}</div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                                <div style={{ fontSize: 12, fontWeight: 700 }}>🏦 Emergency Fund Progress</div>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: "#8b5cf6" }}>Target: {hide ? "---" : fmtK(efTarget)}</div>
                             </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(12,1fr)", gap: 3 }}>
+                            <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10, WebkitOverflowScrolling: "touch" }}>
                                 {timeline.map(r => {
                                     const done = r.efAccum >= efTarget;
                                     return (
-                                        <div key={r.key} style={{ background: done ? "#14532d" : CARD2, borderRadius: 6, padding: "4px 2px", textAlign: "center", border: `1px solid ${done ? "#22c55e" : BORDER}` }}>
-                                            <div style={{ fontSize: 7, color: done ? "#86efac" : MUTED }}>{r.label.split("'")[0].trim()}</div>
+                                        <div key={r.key} style={{ minWidth: 80, background: done ? "#14532d" : CARD2, borderRadius: 10, padding: "10px 8px", textAlign: "center", border: `1px solid ${done ? "#22c55e" : BORDER}`, flexShrink: 0 }}>
+                                            <div style={{ fontSize: 9, color: done ? "#86efac" : MUTED, marginBottom: 4 }}>{r.label}</div>
                                             {done ? (
                                                 <>
-                                                    <div style={{ fontSize: 10, color: "#22c55e", fontWeight: 800 }}>✓</div>
-                                                    <div style={{ fontSize: 8, fontWeight: 700, color: "#22c55e" }}>{hide ? "---" : fmtK(efTarget)}</div>
+                                                    <div style={{ fontSize: 14, color: "#22c55e", fontWeight: 800 }}>✓</div>
+                                                    <div style={{ fontSize: 9, fontWeight: 700, color: "#22c55e" }}>Full</div>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <div style={{ fontSize: 8, color: "#60a5fa", fontWeight: 700 }}>{hide ? "---" : fmtK(r.efAccum)}</div>
-                                                    <div style={{ fontSize: 7, color: DIM }}>{hide ? "---" : `+${fmtK(r.efContrib)}`}</div>
+                                                    <div style={{ fontSize: 11, color: "#60a5fa", fontWeight: 700 }}>{hide ? "---" : fmtK(r.efAccum)}</div>
+                                                    <div style={{ fontSize: 8, color: DIM }}>+{hide ? "---" : fmtK(r.efContrib)}</div>
                                                 </>
                                             )}
                                         </div>
@@ -556,16 +591,16 @@ export default function FinancialPlanner() {
                         {/* Milestones */}
                         <div style={{ ...cs }}>
                             <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>🚀 Milestones ({stepUp}% step-up, {cagr}% CAGR)</div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
+                            <div className="grid-cols-mobile" style={{ gap: 10 }}>
                                 {milestones.map(m => (
-                                    <div key={m.yr} style={{ background: CARD2, borderRadius: 8, padding: "8px 6px", textAlign: "center", border: `1px solid ${BORDER}` }}>
-                                        <div style={{ fontSize: 8, color: DIM }}>Yr {m.yr}</div>
-                                        <div style={{ fontSize: 14, fontWeight: 900, color: m.corpus >= 10000000 ? "#f59e0b" : "#22c55e", marginTop: 2 }}>{hide ? "---" : fmtK(m.corpus)}</div>
-                                        <div style={{ fontSize: 7, color: DIM, marginTop: 2 }}>{hide ? "---" : fmt(m.sip)}/mo</div>
+                                    <div key={m.yr} style={{ background: CARD2, borderRadius: 10, padding: "12px 8px", textAlign: "center", border: `1px solid ${BORDER}` }}>
+                                        <div style={{ fontSize: 9, color: DIM }}>Yr {m.yr}</div>
+                                        <div style={{ fontSize: 18, fontWeight: 900, color: m.corpus >= 10000000 ? "#f59e0b" : "#22c55e", marginTop: 4 }}>{hide ? "---" : fmtK(m.corpus)}</div>
+                                        <div style={{ fontSize: 9, color: DIM, marginTop: 4 }}>{hide ? "---" : fmt(m.sip)}/mo</div>
                                     </div>
                                 ))}
                             </div>
-                            <div style={{ marginTop: 10, fontSize: 8, color: DIM, textAlign: "center" }}>⚠ Estimates only · MF subject to market risk · Not financial advice</div>
+                            <div style={{ marginTop: 12, fontSize: 8, color: DIM, textAlign: "center" }}>⚠ Estimates only · Not financial advice</div>
                         </div>
                     </div>
                 )}
@@ -578,23 +613,23 @@ export default function FinancialPlanner() {
                             <div style={{ fontSize: 9, color: MUTED, textAlign: "center", marginBottom: 12, letterSpacing: 0.5 }}>OVERALL AVG</div>
                             <div style={{ display: "flex", justifyContent: "center" }}><PieChart data={overallPie} size={220} hideNums={hide} /></div>
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginBottom: 12 }}>
                             {[{ title: "Phase 1 — Building EF", sub: `Apr → ${MONTHS_LIST[Math.max(0, p1Rows.length - 1)]?.label || "Aug '26"}`, pie: p1Full, sip: p1AvgSIP }, { title: "Phase 2 — Full SIP", sub: `${p2StartLabel} → Mar '27`, pie: p2Full, sip: p2AvgSIP }].map(({ title, sub, pie, sip }) => (
-                                <div key={title} style={cs}>
-                                    <div style={{ fontSize: 11, fontWeight: 700, color: title.includes("1") ? "#3b82f6" : "#8b5cf6", textAlign: "center", marginBottom: 2 }}>{title}</div>
-                                    <div style={{ fontSize: 9, color: DIM, textAlign: "center", marginBottom: 10 }}>{sub}</div>
-                                    <div style={{ display: "flex", justifyContent: "center" }}><PieChart data={pie} size={170} hideNums={hide} /></div>
+                                <div key={title} style={{ ...cs, padding: "20px" }}>
+                                    <div style={{ fontSize: 12, fontWeight: 700, color: title.includes("1") ? "#3b82f6" : "#8b5cf6", textAlign: "center", marginBottom: 4 }}>{title}</div>
+                                    <div style={{ fontSize: 10, color: DIM, textAlign: "center", marginBottom: 16 }}>{sub}</div>
+                                    <div style={{ display: "flex", justifyContent: "center" }}><PieChart data={pie} size={window.innerWidth < 640 ? 160 : 180} hideNums={hide} /></div>
                                 </div>
                             ))}
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
                             {[{ title: `MF Phase 1 (${hide ? "---" : fmt(p1AvgSIP)})`, pie: p1MFPie, sip: p1AvgSIP }, { title: `MF Phase 2 (${hide ? "---" : fmt(p2AvgSIP)})`, pie: p2MFPie, sip: p2AvgSIP }].map(({ title, pie, sip }) => (
-                                <div key={title} style={cs}>
-                                    <div style={{ fontSize: 11, fontWeight: 700, textAlign: "center", marginBottom: 10 }}>{title}</div>
-                                    <div style={{ display: "flex", justifyContent: "center" }}><PieChart data={pie} size={160} hideNums={hide} /></div>
-                                    <div style={{ marginTop: 10, borderTop: `1px solid ${BORDER}`, paddingTop: 8 }}>
+                                <div key={title} style={{ ...cs, padding: "20px" }}>
+                                    <div style={{ fontSize: 12, fontWeight: 700, textAlign: "center", marginBottom: 16 }}>{title}</div>
+                                    <div style={{ display: "flex", justifyContent: "center" }}><PieChart data={pie} size={window.innerWidth < 640 ? 150 : 170} hideNums={hide} /></div>
+                                    <div style={{ marginTop: 20, borderTop: `1px solid ${BORDER}`, paddingTop: 12 }}>
                                         {funds.map(f => (
-                                            <div key={f.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, marginBottom: 3 }}>
+                                            <div key={f.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 5 }}>
                                                 <span style={{ color: f.color }}>{f.shortName}</span>
                                                 <span style={{ color: TEXT, fontWeight: 700 }}>{hide ? `${fundPcts[f.id] || 0}%` : fmt(Math.round(sip * (fundPcts[f.id] || 0) / 100))}</span>
                                             </div>
@@ -610,63 +645,63 @@ export default function FinancialPlanner() {
                 {/* TIMELINE */}
                 {mainTab === "timeline" && (
                     <div>
-                        <div style={{ overflowX: "auto", marginBottom: 12 }}>
-                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+                        <div style={{ overflowX: "auto", marginBottom: 12, borderRadius: 12, border: `1px solid ${BORDER}` }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
                                 <thead>
-                                    <tr style={{ background: CARD }}>
+                                    <tr style={{ background: "rgba(10, 22, 40, 0.8)" }}>
                                         {["Month", "Ph", "Spends", "RD", "Base SIP", "EF+", "EF Bal", "Actual SIP", ""].map(h => (
-                                            <th key={h} style={{ padding: "6px 8px", textAlign: h === "Month" ? "left" : "right", color: MUTED, fontWeight: 700, borderBottom: `1px solid ${BORDER}`, whiteSpace: "nowrap" }}>{h}</th>
+                                            <th key={h} style={{ padding: "12px 10px", textAlign: h === "Month" ? "left" : "right", color: MUTED, fontWeight: 700, borderBottom: `1px solid ${BORDER}`, whiteSpace: "nowrap" }}>{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {timeline.map(r => (
-                                        <tr key={r.key} style={{ borderBottom: `1px solid ${BORDER}`, background: r.overridden ? "#0f2035" : "transparent" }}>
-                                            <td style={{ padding: "6px 8px", fontWeight: 700, color: r.phase === 2 ? "#60a5fa" : "#86efac" }}>{r.overridden && <span style={{ color: "#f59e0b", fontSize: 8 }}>★ </span>}{r.label}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right" }}><span style={{ background: r.phase === 2 ? "#1d4ed8" : "#15803d", color: "#fff", borderRadius: 4, padding: "1px 6px", fontSize: 9 }}>P{r.phase}</span></td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#f97316" }}>{hide ? pct(r.spends, salary) : fmt(r.spends)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#22c55e" }}>{hide ? pct(r.rd, salary) : fmt(r.rd)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#3b82f6" }}>{hide ? pct(r.sip, salary) : fmt(r.sip)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#a78bfa" }}>{r.efContrib > 0 ? (hide ? pct(r.efContrib, efTarget) : fmt(r.efContrib)) : "–"}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#8b5cf6", minWidth: 80 }}>
-                                                <Bar value={r.efAccum} max={efTarget} color="#8b5cf6" h={4} />
-                                                <span style={{ fontSize: 8 }}>{hide ? "---" : fmtK(r.efAccum)}</span>
+                                        <tr key={r.key} style={{ borderBottom: `1px solid ${BORDER}`, background: r.overridden ? "rgba(59, 130, 246, 0.1)" : "transparent" }}>
+                                            <td style={{ padding: "12px 10px", fontWeight: 700, color: r.phase === 2 ? "#60a5fa" : "#86efac", whiteSpace: "nowrap" }}>{r.overridden && <span style={{ color: "#f59e0b", fontSize: 10 }}>★ </span>}{r.label}</td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right" }}><span style={{ background: r.phase === 2 ? "#1d4ed8" : "#15803d", color: "#fff", borderRadius: 4, padding: "2px 8px", fontSize: 10 }}>P{r.phase}</span></td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#f97316" }}>{hide ? "---" : fmt(r.spends)}</td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#22c55e" }}>{hide ? "---" : fmt(r.rd)}</td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#3b82f6" }}>{hide ? "---" : fmt(r.sip)}</td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#a78bfa" }}>{r.efContrib > 0 ? (hide ? "---" : fmt(r.efContrib)) : "–"}</td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#8b5cf6", minWidth: 100 }}>
+                                                <Bar value={r.efAccum} max={efTarget} color="#8b5cf6" h={5} />
+                                                <span style={{ fontSize: 9 }}>{hide ? "---" : fmtK(r.efAccum)}</span>
                                             </td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#22c55e", fontWeight: 700 }}>{hide ? pct(r.totalSIP, salary) : fmt(r.totalSIP)}</td>
-                                            <td style={{ padding: "6px 8px" }}><button onClick={() => { setSelMonth(r.key); setLeftTab("budget"); }} style={{ padding: "2px 7px", borderRadius: 4, fontSize: 8, fontWeight: 700, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, cursor: "pointer" }}>Edit</button></td>
+                                            <td style={{ padding: "12px 10px", textAlign: "right", color: "#22c55e", fontWeight: 700 }}>{hide ? "---" : fmt(r.totalSIP)}</td>
+                                            <td style={{ padding: "12px 10px" }}><button onClick={() => { setSelMonth(r.key); setLeftTab("budget"); setSidebarOpen(true); }} style={{ padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, border: `1px solid ${BORDER}`, background: "transparent", color: MUTED, cursor: "pointer" }}>Edit</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                         <div style={{ ...cs, marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Fund-wise SIP</div>
-                            <div style={{ overflowX: "auto" }}>
-                                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
-                                    <thead>
-                                        <tr style={{ background: "#0a1628" }}>
-                                            <th style={{ padding: "5px 8px", textAlign: "left", color: MUTED, fontWeight: 700 }}>Month</th>
-                                            {funds.map(f => <th key={f.id} style={{ padding: "5px 8px", textAlign: "right", color: f.color, fontWeight: 700 }}>{f.shortName}</th>)}
-                                            <th style={{ padding: "5px 8px", textAlign: "right", color: MUTED, fontWeight: 700 }}>Total</th>
+                            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Fund-wise SIP Allocation</div>
+                            <div style={{ overflowX: "auto", borderRadius: 10, border: `1px solid ${BORDER}` }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+                                    <thead style={{ background: "rgba(10, 22, 40, 0.8)" }}>
+                                        <tr>
+                                            <th style={{ padding: "10px 12px", textAlign: "left", color: MUTED, fontWeight: 700, borderBottom: `1px solid ${BORDER}` }}>Month</th>
+                                            {funds.map(f => <th key={f.id} style={{ padding: "10px 12px", textAlign: "right", color: f.color, fontWeight: 700, borderBottom: `1px solid ${BORDER}`, whiteSpace: "nowrap" }}>{f.shortName}</th>)}
+                                            <th style={{ padding: "10px 12px", textAlign: "right", color: MUTED, fontWeight: 700, borderBottom: `1px solid ${BORDER}` }}>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {timeline.map(r => (
                                             <tr key={r.key} style={{ borderBottom: `1px solid ${BORDER}` }}>
-                                                <td style={{ padding: "5px 8px", color: MUTED }}>{r.label}</td>
-                                                {funds.map(f => <td key={f.id} style={{ padding: "5px 8px", textAlign: "right", fontWeight: 700, color: TEXT }}>{hide ? `${fundPcts[f.id] || 0}%` : fmt(r.fundAllocs.find(a => a.id === f.id)?.amount || 0)}</td>)}
-                                                <td style={{ padding: "5px 8px", textAlign: "right", fontWeight: 700, color: "#3b82f6" }}>{hide ? "---" : fmt(r.totalSIP)}</td>
+                                                <td style={{ padding: "10px 12px", color: MUTED, whiteSpace: "nowrap" }}>{r.label}</td>
+                                                {funds.map(f => <td key={f.id} style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, color: TEXT }}>{hide ? "---" : fmt(r.fundAllocs.find(a => a.id === f.id)?.amount || 0)}</td>)}
+                                                <td style={{ padding: "10px 12px", textAlign: "right", fontWeight: 700, color: "#3b82f6" }}>{hide ? "---" : fmt(r.totalSIP)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                        <div className="grid-cols-mobile" style={{ gap: 12 }}>
                             {[["Total MF", totalMF, "#3b82f6"], ["Total RD", totalRD, "#22c55e"], ["Total Saved", totalMF + totalRD, "#f59e0b"]].map(([l, v, c]) => (
-                                <div key={l} style={{ ...cs, textAlign: "center", padding: 12 }}>
-                                    <div style={{ fontSize: 9, color: DIM }}>{l}</div>
-                                    <div style={{ fontSize: 18, fontWeight: 800, color: c }}>{hide ? "---" : fmtK(v)}</div>
+                                <div key={l} style={{ ...cs, textAlign: "center", padding: 20 }}>
+                                    <div style={{ fontSize: 11, color: DIM, marginBottom: 8 }}>{l}</div>
+                                    <div style={{ fontSize: 24, fontWeight: 800, color: c }}>{hide ? "---" : fmtK(v)}</div>
                                 </div>
                             ))}
                         </div>
@@ -742,46 +777,49 @@ export default function FinancialPlanner() {
                 {/* PROJECTION */}
                 {mainTab === "projection" && (
                     <div>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+                        <div className="grid-cols-mobile" style={{ gap: 12, marginBottom: 16 }}>
                             {[[5, "#3b82f6"], [10, "#a78bfa"]].map(([y, c]) => {
                                 const r = projection.find(p => p.yr === y);
-                                return <div key={y} style={{ ...cs, textAlign: "center", padding: "12px 10px" }}>
-                                    <div style={{ fontSize: 8, color: MUTED }}>{y}Y Corpus</div>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: c }}>{hide ? "---" : fmtK(r?.corpus || 0)}</div>
-                                    <div style={{ fontSize: 9, color: DIM }}>SIP {hide ? "---" : fmtK(r?.monthly || 0)}/mo</div>
+                                return <div key={y} style={{ ...cs, textAlign: "center", padding: "20px 16px" }}>
+                                    <div style={{ fontSize: 10, color: MUTED, fontWeight: 700 }}>{y}Y Projected Corpus</div>
+                                    <div style={{ fontSize: 28, fontWeight: 900, color: c, margin: "8px 0" }}>{hide ? "---" : fmtK(r?.corpus || 0)}</div>
+                                    <div style={{ fontSize: 11, color: DIM }}>With SIP of {hide ? "---" : fmtK(r?.monthly || 0)}/mo</div>
                                 </div>;
                             })}
                         </div>
                         <div style={{ ...cs, marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Year-by-Year</div>
-                            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
-                                <thead>
-                                    <tr><th style={{ padding: "6px 8px", textAlign: "left", color: MUTED, borderBottom: `1px solid ${BORDER}` }}>Year</th>
-                                        {["SIP/mo", "Annual", "Corpus", "+Growth"].map(h => <th key={h} style={{ padding: "6px 8px", textAlign: "right", color: MUTED, borderBottom: `1px solid ${BORDER}` }}>{h}</th>)}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {projection.map((r, i) => (
-                                        <tr key={r.yr} style={{ borderBottom: `1px solid ${BORDER}`, background: [4, 9].includes(i) ? CARD : "transparent" }}>
-                                            <td style={{ padding: "6px 8px", fontWeight: 700 }}>Yr {r.yr}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#60a5fa" }}>{hide ? "---" : fmtK(r.monthly)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: MUTED }}>{hide ? "---" : fmtK(r.monthly * 12)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", fontWeight: 800, color: r.corpus >= 10000000 ? "#f59e0b" : "#22c55e" }}>{hide ? "---" : fmtK(r.corpus)}</td>
-                                            <td style={{ padding: "6px 8px", textAlign: "right", color: "#a78bfa", fontSize: 9 }}>+{hide ? "---" : fmtK(r.corpus - (i > 0 ? projection[i - 1].corpus : 0))}</td>
+                            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Year-by-Year Growth Details</div>
+                            <div style={{ overflowX: "auto", borderRadius: 10, border: `1px solid ${BORDER}` }}>
+                                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                                    <thead style={{ background: "rgba(10, 22, 40, 0.8)" }}>
+                                        <tr>
+                                            <th style={{ padding: "12px 14px", textAlign: "left", color: MUTED, borderBottom: `1px solid ${BORDER}` }}>Year</th>
+                                            {["SIP/mo", "Annual Inv", "Corpus", "+Growth"].map(h => <th key={h} style={{ padding: "12px 14px", textAlign: "right", color: MUTED, borderBottom: `1px solid ${BORDER}`, whiteSpace: "nowrap" }}>{h}</th>)}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {projection.map((r, i) => (
+                                            <tr key={r.yr} style={{ borderBottom: `1px solid ${BORDER}`, background: [4, 9, 14, 19, 24].includes(i) ? "rgba(59, 130, 246, 0.05)" : "transparent" }}>
+                                                <td style={{ padding: "12px 14px", fontWeight: 700, whiteSpace: "nowrap" }}>Year {r.yr}</td>
+                                                <td style={{ padding: "12px 14px", textAlign: "right", color: "#60a5fa" }}>{hide ? "---" : fmtK(r.monthly)}</td>
+                                                <td style={{ padding: "12px 14px", textAlign: "right", color: MUTED }}>{hide ? "---" : fmtK(r.monthly * 12)}</td>
+                                                <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: r.corpus >= 10000000 ? "#f59e0b" : "#22c55e" }}>{hide ? "---" : fmtK(r.corpus)}</td>
+                                                <td style={{ padding: "12px 14px", textAlign: "right", color: "#a78bfa", fontSize: 10 }}>+{hide ? "---" : fmtK(r.corpus - (i > 0 ? projection[i - 1].corpus : 0))}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div style={{ ...cs, marginBottom: 12 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 10 }}>Step-Up Impact ({projYrs} yrs)</div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Step-Up Impact Analysis ({projYrs} yrs)</div>
+                            <div className="grid-cols-mobile" style={{ gap: 12 }}>
                                 {[0, 5, 10, 15].map(su => {
                                     let c2 = 0, m = p2AvgSIP; const rate = cagr / 100 / 12;
                                     for (let yr = 0; yr < projYrs; yr++) { for (let mo = 0; mo < 12; mo++) { c2 = c2 * (1 + rate) + m; } m = Math.round(m * (1 + su / 100)); }
-                                    return <div key={su} style={{ background: CARD2, borderRadius: 8, padding: 10, textAlign: "center", border: su === stepUp ? "2px solid #8b5cf6" : `1px solid ${BORDER}` }}>
-                                        <div style={{ fontSize: 9, color: DIM }}>{su}%</div>
-                                        <div style={{ fontSize: 14, fontWeight: 900, color: su === stepUp ? "#22c55e" : TEXT }}>{hide ? "---" : fmtK(Math.round(c2))}</div>
+                                    return <div key={su} style={{ background: su === stepUp ? "rgba(139, 92, 246, 0.2)" : CARD2, borderRadius: 12, padding: 16, textAlign: "center", border: su === stepUp ? "2px solid #8b5cf6" : `1px solid ${BORDER}` }}>
+                                        <div style={{ fontSize: 11, color: DIM, fontWeight: 700 }}>{su}% Step-up</div>
+                                        <div style={{ fontSize: 20, fontWeight: 900, color: su === stepUp ? "#22c55e" : TEXT, marginTop: 4 }}>{hide ? "---" : fmtK(Math.round(c2))}</div>
                                     </div>;
                                 })}
                             </div>
