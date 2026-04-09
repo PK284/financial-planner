@@ -496,6 +496,7 @@ export default function FinancialPlanner() {
                     Apply & Close
                 </button>
             </div>
+            </div>
             
             {/* RIGHT - MAIN CONTENT */}
             <div className="content-wrapper">
