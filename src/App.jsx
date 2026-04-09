@@ -299,7 +299,7 @@ export default function FinancialPlanner() {
                                 style={{ width: 110, background: "transparent", border: "none", borderBottom: "2px solid #22c55e", color: "#22c55e", fontSize: 20, fontWeight: 900, padding: "2px 0", textAlign: "center", outline: "none" }} />
                         </div>
                         : <div onClick={() => setEditSal(true)} style={{ fontSize: 22, fontWeight: 900, color: "#22c55e", cursor: "pointer", marginTop: 4 }} title="Click to edit">
-                            {fmt(salary)} <span style={{ fontSize: 9, color: DIM }}>✏</span>
+                            {hide ? "---" : fmt(salary)} <span style={{ fontSize: 9, color: DIM }}>✏</span>
                         </div>
                     }
                 </div>
